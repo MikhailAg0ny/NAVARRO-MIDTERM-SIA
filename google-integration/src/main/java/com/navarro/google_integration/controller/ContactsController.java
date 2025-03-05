@@ -19,6 +19,7 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/contacts")
@@ -55,7 +56,7 @@ public class ContactsController {
     }
 
     @PostMapping
-    public String addContact(@RequestParam String name, @RequestParam String email, @RequestParam String phone,
+    public String addContact(@RequestParam String name, @RequestParam String email, @RequestParam List<String> phoneNumbers,
                              OAuth2AuthenticationToken authentication, RedirectAttributes redirectAttributes) {
         try {
             // Create a new Person object
@@ -72,10 +73,15 @@ public class ContactsController {
             contactEmail.setValue(email);
             person.setEmailAddresses(Collections.singletonList(contactEmail));
 
-            // Set phone number
-            PhoneNumber contactPhone = new PhoneNumber();
-            contactPhone.setValue(phone);
-            person.setPhoneNumbers(Collections.singletonList(contactPhone));
+            // Set phone numbers
+            List<PhoneNumber> contactPhones = phoneNumbers.stream()
+                    .map(phone -> {
+                        PhoneNumber contactPhone = new PhoneNumber();
+                        contactPhone.setValue(phone);
+                        return contactPhone;
+                    })
+                    .collect(Collectors.toList());
+            person.setPhoneNumbers(contactPhones);
 
             // Add the contact
             Person addedPerson = googleContactsService.addContact(person, authentication);
@@ -91,7 +97,7 @@ public class ContactsController {
 
     @PostMapping("/update")
     public String updateContact(@RequestParam String resourceName, @RequestParam String name,
-                                @RequestParam String email, @RequestParam String phone,
+                                @RequestParam String email, @RequestParam List<String> phoneNumbers,
                                 OAuth2AuthenticationToken authentication, RedirectAttributes redirectAttributes) {
         try {
             // Create a new Person object for the update
@@ -108,10 +114,15 @@ public class ContactsController {
             contactEmail.setValue(email);
             person.setEmailAddresses(Collections.singletonList(contactEmail));
 
-            // Set phone number
-            PhoneNumber contactPhone = new PhoneNumber();
-            contactPhone.setValue(phone);
-            person.setPhoneNumbers(Collections.singletonList(contactPhone));
+            // Set phone numbers
+            List<PhoneNumber> contactPhones = phoneNumbers.stream()
+                    .map(phone -> {
+                        PhoneNumber contactPhone = new PhoneNumber();
+                        contactPhone.setValue(phone);
+                        return contactPhone;
+                    })
+                    .collect(Collectors.toList());
+            person.setPhoneNumbers(contactPhones);
 
             // Update the contact
             googleContactsService.updateContact(resourceName, person, authentication);

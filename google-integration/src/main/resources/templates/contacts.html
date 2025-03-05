@@ -36,7 +36,13 @@
     <form id="add-contact-form" class="add-form" th:action="@{/contacts}" method="post">
         <input type="text" name="name" placeholder="Contact Name" required>
         <input type="email" name="email" placeholder="Email Address" required>
-        <input type="tel" name="phone" placeholder="Phone Number" required>
+        <div id="phone-container">
+            <div class="phone-input">
+                <input type="tel" name="phoneNumbers" placeholder="Phone Number" required>
+                <button type="button" class="remove-phone-btn">Remove</button>
+            </div>
+        </div>
+        <button type="button" id="add-phone-btn" class="btn-secondary">Add Phone Number</button>
         <button type="submit" class="btn-success">Add Contact</button>
     </form>
 
@@ -60,13 +66,23 @@
         <tr th:each="contact : ${contacts}" class="contact-row">
             <td th:text="${contact.names != null && !contact.names.isEmpty() ? contact.names[0].displayName : 'No Name'}">Name</td>
             <td th:text="${contact.emailAddresses != null && !contact.emailAddresses.isEmpty() ? contact.emailAddresses[0].value : 'No Email'}">Email</td>
-            <td th:text="${contact.phoneNumbers != null && !contact.phoneNumbers.isEmpty() ? contact.phoneNumbers[0].value : 'No Phone'}">Phone</td>
+            <td>
+                <ul>
+                    <li th:each="phone : ${contact.phoneNumbers}" th:text="${phone.value}">Phone</li>
+                </ul>
+            </td>
             <td class="actions">
                 <form class="edit-form" th:action="@{/contacts/update}" method="post">
                     <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
                     <input type="text" name="name" th:value="${contact.names != null && !contact.names.isEmpty() ? contact.names[0].displayName : ''}" required>
                     <input type="email" name="email" th:value="${contact.emailAddresses != null && !contact.emailAddresses.isEmpty() ? contact.emailAddresses[0].value : ''}" required>
-                    <input type="tel" name="phone" th:value="${contact.phoneNumbers != null && !contact.phoneNumbers.isEmpty() ? contact.phoneNumbers[0].value : ''}" required>
+                    <div id="edit-phone-container" th:each="phone, iterStat : ${contact.phoneNumbers}">
+                        <div class="phone-input">
+                            <input type="tel" name="phoneNumbers" th:value="${phone.value}" required>
+                            <button type="button" class="remove-phone-btn" th:if="${iterStat.index > 0}">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-phone-btn">Add Phone Number</button>
                     <button type="submit" class="edit-btn">Update</button>
                 </form>
                 <form th:action="@{/contacts/delete}" method="post">
@@ -105,5 +121,54 @@
 
 <script th:src="@{/js/animations.js}"></script>
 <script th:src="@{/js/contacts.js}"></script>
+<script>
+    document.getElementById('add-phone-btn').addEventListener('click', function() {
+        var phoneContainer = document.getElementById('phone-container');
+        var phoneInputDiv = document.createElement('div');
+        phoneInputDiv.className = 'phone-input';
+        var newPhoneInput = document.createElement('input');
+        newPhoneInput.type = 'tel';
+        newPhoneInput.name = 'phoneNumbers';
+        newPhoneInput.placeholder = 'Phone Number';
+        var removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'remove-phone-btn';
+        removeButton.textContent = 'Remove';
+        removeButton.addEventListener('click', function() {
+            phoneInputDiv.remove();
+        });
+        phoneInputDiv.appendChild(newPhoneInput);
+        phoneInputDiv.appendChild(removeButton);
+        phoneContainer.appendChild(phoneInputDiv);
+    });
+
+    document.querySelectorAll('.add-phone-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var phoneContainer = this.previousElementSibling;
+            var phoneInputDiv = document.createElement('div');
+            phoneInputDiv.className = 'phone-input';
+            var newPhoneInput = document.createElement('input');
+            newPhoneInput.type = 'tel';
+            newPhoneInput.name = 'phoneNumbers';
+            newPhoneInput.placeholder = 'Phone Number';
+            var removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'remove-phone-btn';
+            removeButton.textContent = 'Remove';
+            removeButton.addEventListener('click', function() {
+                phoneInputDiv.remove();
+            });
+            phoneInputDiv.appendChild(newPhoneInput);
+            phoneInputDiv.appendChild(removeButton);
+            phoneContainer.appendChild(phoneInputDiv);
+        });
+    });
+
+    document.querySelectorAll('.remove-phone-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            this.parentElement.remove();
+        });
+    });
+</script>
 </body>
 </html>

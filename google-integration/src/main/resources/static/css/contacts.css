@@ -205,7 +205,7 @@ button:active {
 /* Form styles */
 .add-form {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   margin-bottom: 25px;
   padding: 20px;
   background-color: #f9f9f9;
@@ -224,9 +224,9 @@ button:active {
 .add-form input[type="text"],
 .add-form input[type="email"],
 .add-form input[type="tel"] {
-  width: 30%;
+  width: 100%;
   padding: 12px;
-  margin-right: 10px;
+  margin-bottom: 10px;
   border: 1px solid var(--medium-gray);
   border-radius: 4px;
   transition: all 0.3s;
@@ -237,6 +237,47 @@ button:active {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
   outline: none;
+}
+
+#phone-container {
+  display: flex;
+  flex-direction: column;
+}
+
+#phone-container input {
+  margin-bottom: 10px;
+}
+
+.btn-secondary {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+  background-color: #3367D6;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-success {
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-success:hover {
+  background-color: #2e8b46;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Table styles */
