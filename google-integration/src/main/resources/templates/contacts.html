@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/contacts.css}">
 </head>
 <body>
@@ -34,16 +35,36 @@
 
     <!-- Add Contact Form -->
     <form id="add-contact-form" class="add-form" th:action="@{/contacts}" method="post">
-        <input type="text" name="name" placeholder="Contact Name" required>
-        <input type="email" name="email" placeholder="Email Address" required>
+        <div class="form-field">
+            <label for="contact-name">Contact Name</label>
+            <input type="text" id="contact-name" name="name" placeholder="Enter contact name" required>
+        </div>
+        
+        <div class="form-field">
+            <label for="contact-email">Email Address</label>
+            <input type="email" id="contact-email" name="email" placeholder="Enter email address" required>
+        </div>
+        
         <div id="phone-container">
             <div class="phone-input">
-                <input type="tel" name="phoneNumbers" placeholder="Phone Number" required>
-                <button type="button" class="remove-phone-btn">Remove</button>
+                <div class="form-field" style="flex-grow: 1;">
+                    <label for="contact-phone">Phone Number</label>
+                    <input type="tel" id="contact-phone" name="phoneNumbers" placeholder="Enter phone number" required>
+           <     </div>
+                <button type="button" class="remove-phone-btn" style="margin-top: 24px;">
+                    <i class="fas fa-times"></i>
+                </button> 
             </div>
         </div>
-        <button type="button" id="add-phone-btn" class="btn-secondary">Add Phone Number</button>
-        <button type="submit" class="btn-success">Add Contact</button>
+        
+        <div class="form-buttons">
+            <button type="button" id="add-phone-btn" class="btn-secondary">
+                <i class="fas fa-plus"></i> Add Phone Number
+            </button>
+            <button type="submit" class="btn-success">
+                <i class="fas fa-save"></i> Add Contact
+            </button>
+        </div>
     </form>
 
     <!-- Contacts Table -->
@@ -67,27 +88,54 @@
             <td th:text="${contact.names != null && !contact.names.isEmpty() ? contact.names[0].displayName : 'No Name'}">Name</td>
             <td th:text="${contact.emailAddresses != null && !contact.emailAddresses.isEmpty() ? contact.emailAddresses[0].value : 'No Email'}">Email</td>
             <td>
-                <ul>
+                <ul class="phone-list">
                     <li th:each="phone : ${contact.phoneNumbers}" th:text="${phone.value}">Phone</li>
                 </ul>
             </td>
             <td class="actions">
+            
                 <form class="edit-form" th:action="@{/contacts/update}" method="post">
                     <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
-                    <input type="text" name="name" th:value="${contact.names != null && !contact.names.isEmpty() ? contact.names[0].displayName : ''}" required>
-                    <input type="email" name="email" th:value="${contact.emailAddresses != null && !contact.emailAddresses.isEmpty() ? contact.emailAddresses[0].value : ''}" required>
-                    <div id="edit-phone-container" th:each="phone, iterStat : ${contact.phoneNumbers}">
-                        <div class="phone-input">
+                    
+                    <div class="edit-form-field">
+                        <label for="edit-name">Name</label>
+                        <input type="text" id="edit-name" name="name" 
+                            th:value="${contact.names != null && !contact.names.isEmpty() ? contact.names[0].displayName : ''}" required>
+                    </div>
+                    
+                    <div class="edit-form-field">
+                        <label for="edit-email">Email</label>
+                        <input type="email" id="edit-email" name="email" 
+                            th:value="${contact.emailAddresses != null && !contact.emailAddresses.isEmpty() ? contact.emailAddresses[0].value : ''}" required>
+                    </div>
+                    
+                    <div class="edit-phone-container">
+                        
+                        <div th:each="phone, iterStat : ${contact.phoneNumbers}" class="edit-phone-input">
+                            <label for="edit-phone">Phone Number</label>
                             <input type="tel" name="phoneNumbers" th:value="${phone.value}" required>
-                            <button type="button" class="remove-phone-btn" th:if="${iterStat.index > 0}">Remove</button>
+                            <button type="button" class="remove-phone-btn" th:if="${iterStat.index > 0}">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
                     </div>
-                    <button type="button" class="add-phone-btn">Add Phone Number</button>
-                    <button type="submit" class="edit-btn">Update</button>
+                    
+                    <div class="edit-form-buttons">
+                        <button type="button" class="add-phone-btn">
+                            <i class="fas fa-plus"></i> Add Phone
+                        </button>
+                        <div>
+                            <button type="button" class="cancel-edit-btn">Cancel</button>
+                            <button type="submit" class="update-btn">Save Changes</button>
+                            <button type="button" class="delete-btn" title="Delete Contact">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
                 </form>
-                <form th:action="@{/contacts/delete}" method="post">
+                
+                <form th:action="@{/contacts/delete}" method="post" style="display:none;">
                     <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
-                    <button type="button" class="delete-btn">Delete</button>
                 </form>
             </td>
         </tr>
@@ -122,51 +170,218 @@
 <script th:src="@{/js/animations.js}"></script>
 <script th:src="@{/js/contacts.js}"></script>
 <script>
+    // Phone number handling for the add contact form
     document.getElementById('add-phone-btn').addEventListener('click', function() {
-        var phoneContainer = document.getElementById('phone-container');
-        var phoneInputDiv = document.createElement('div');
+        const phoneContainer = document.getElementById('phone-container');
+        const phoneInputDiv = document.createElement('div');
         phoneInputDiv.className = 'phone-input';
-        var newPhoneInput = document.createElement('input');
+        
+        // Create form field container
+        const formField = document.createElement('div');
+        formField.className = 'form-field';
+        formField.style.flexGrow = '1';
+        
+        // Create label
+        const label = document.createElement('label');
+        label.textContent = 'Additional Phone';
+        
+        // Create input
+        const newPhoneInput = document.createElement('input');
         newPhoneInput.type = 'tel';
         newPhoneInput.name = 'phoneNumbers';
-        newPhoneInput.placeholder = 'Phone Number';
-        var removeButton = document.createElement('button');
+        newPhoneInput.placeholder = 'Enter phone number';
+        newPhoneInput.required = true;
+        
+        // Create remove button
+        const removeButton = document.createElement('button');
         removeButton.type = 'button';
         removeButton.className = 'remove-phone-btn';
-        removeButton.textContent = 'Remove';
+        removeButton.style.marginTop = '24px';
+        
+        // Create icon for remove button
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-times';
+        removeButton.appendChild(icon);
+        
+        // Add event listener to remove button
         removeButton.addEventListener('click', function() {
-            phoneInputDiv.remove();
-        });
-        phoneInputDiv.appendChild(newPhoneInput);
-        phoneInputDiv.appendChild(removeButton);
-        phoneContainer.appendChild(phoneInputDiv);
-    });
-
-    document.querySelectorAll('.add-phone-btn').forEach(function(button) {
-        button.addEventListener('click', function() {
-            var phoneContainer = this.previousElementSibling;
-            var phoneInputDiv = document.createElement('div');
-            phoneInputDiv.className = 'phone-input';
-            var newPhoneInput = document.createElement('input');
-            newPhoneInput.type = 'tel';
-            newPhoneInput.name = 'phoneNumbers';
-            newPhoneInput.placeholder = 'Phone Number';
-            var removeButton = document.createElement('button');
-            removeButton.type = 'button';
-            removeButton.className = 'remove-phone-btn';
-            removeButton.textContent = 'Remove';
-            removeButton.addEventListener('click', function() {
+            phoneInputDiv.classList.add('fade-out');
+            setTimeout(function() {
                 phoneInputDiv.remove();
-            });
-            phoneInputDiv.appendChild(newPhoneInput);
-            phoneInputDiv.appendChild(removeButton);
-            phoneContainer.appendChild(phoneInputDiv);
+            }, 300);
         });
+        
+        // Assemble the elements
+        formField.appendChild(label);
+        formField.appendChild(newPhoneInput);
+        phoneInputDiv.appendChild(formField);
+        phoneInputDiv.appendChild(removeButton);
+        
+        // Add to container with animation
+        phoneInputDiv.style.opacity = '0';
+        phoneContainer.appendChild(phoneInputDiv);
+        
+        // Trigger animation
+        setTimeout(function() {
+            phoneInputDiv.style.transition = 'all 0.3s ease';
+            phoneInputDiv.style.opacity = '1';
+        }, 10);
     });
 
-    document.querySelectorAll('.remove-phone-btn').forEach(function(button) {
-        button.addEventListener('click', function() {
-            this.parentElement.remove();
+    // Phone number handling for edit forms
+    document.addEventListener('DOMContentLoaded', function() {
+        // Edit toggle buttons
+        document.querySelectorAll('.edit-toggle').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const actionCell = this.closest('.actions');
+                const editForm = actionCell.querySelector('.edit-form');
+                
+                // Hide all other open forms first
+                document.querySelectorAll('.edit-form.active').forEach(function(form) {
+                    if (form !== editForm) {
+                        form.classList.remove('active');
+                    }
+                });
+                
+                // Toggle current form
+                editForm.classList.toggle('active');
+            });
+        });
+        
+        // Cancel edit buttons
+        document.querySelectorAll('.cancel-edit-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const editForm = this.closest('.edit-form');
+                editForm.classList.remove('active');
+            });
+        });
+        
+        // Add phone button in edit forms
+        document.querySelectorAll('.edit-form .add-phone-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const phoneContainer = this.closest('.edit-form').querySelector('.edit-phone-container');
+                const phoneInputDiv = document.createElement('div');
+                phoneInputDiv.className = 'edit-phone-input';
+                
+                // Create input
+                const newPhoneInput = document.createElement('input');
+                newPhoneInput.type = 'tel';
+                newPhoneInput.name = 'phoneNumbers';
+                newPhoneInput.placeholder = 'Enter phone number';
+                newPhoneInput.required = true;
+                
+                // Create remove button
+                const removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.className = 'remove-phone-btn';
+                
+                // Create icon for remove button
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-times';
+                removeButton.appendChild(icon);
+                
+                // Add event listener to remove button
+                removeButton.addEventListener('click', function() {
+                    phoneInputDiv.classList.add('fade-out');
+                    setTimeout(function() {
+                        phoneInputDiv.remove();
+                    }, 300);
+                });
+                
+                // Assemble the elements
+                phoneInputDiv.appendChild(newPhoneInput);
+                phoneInputDiv.appendChild(removeButton);
+                
+                // Add to container with animation
+                phoneInputDiv.style.opacity = '0';
+                phoneContainer.appendChild(phoneInputDiv);
+                
+                // Trigger animation
+                setTimeout(function() {
+                    phoneInputDiv.style.transition = 'all 0.3s ease';
+                    phoneInputDiv.style.opacity = '1';
+                }, 10);
+            });
+        });
+        
+        // Remove phone buttons in edit forms
+        document.querySelectorAll('.edit-phone-input .remove-phone-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const phoneInput = this.closest('.edit-phone-input');
+                phoneInput.classList.add('fade-out');
+                setTimeout(function() {
+                    phoneInput.remove();
+                }, 300);
+            });
+        });
+        
+        // Delete buttons
+        document.querySelectorAll('.delete-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const deleteForm = this.closest('.actions').querySelector('form[action*="/contacts/delete"]');
+                
+                // Show delete confirmation modal
+                const modal = document.getElementById('delete-modal');
+                modal.style.display = 'block';
+                setTimeout(function() {
+                    modal.classList.add('show');
+                }, 10);
+                
+                // Set up the confirm delete button
+                document.getElementById('confirm-delete').onclick = function() {
+                    deleteForm.submit();
+                    modal.classList.remove('show');
+                    setTimeout(function() {
+                        modal.style.display = 'none';
+                    }, 300);
+                };
+                
+                // Set up the cancel delete button
+                document.getElementById('cancel-delete').onclick = function() {
+                    modal.classList.remove('show');
+                    setTimeout(function() {
+                        modal.style.display = 'none';
+                    }, 300);
+                };
+            });
+        });
+        
+        // Logout button
+        document.getElementById('logout-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Show logout confirmation modal
+            const modal = document.getElementById('logout-modal');
+            modal.style.display = 'block';
+            setTimeout(function() {
+                modal.classList.add('show');
+            }, 10);
+            
+            // Set up the confirm logout button
+            document.getElementById('confirm-logout').onclick = function() {
+                document.getElementById('logout-form').submit();
+            };
+            
+            // Set up the cancel logout button
+            document.getElementById('cancel-logout').onclick = function() {
+                modal.classList.remove('show');
+                setTimeout(function() {
+                    modal.style.display = 'none';
+                }, 300);
+            };
+        });
+        
+        // Handle initial remove phone buttons
+        document.querySelectorAll('.remove-phone-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const phoneInput = this.closest('.phone-input') || this.closest('.edit-phone-input');
+                if (phoneInput) {
+                    phoneInput.classList.add('fade-out');
+                    setTimeout(function() {
+                        phoneInput.remove();
+                    }, 300);
+                }
+            });
         });
     });
 </script>

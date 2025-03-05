@@ -236,3 +236,48 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
 });
+
+document.getElementById('add-phone-btn').addEventListener('click', function() {
+    const phoneContainer = document.getElementById('phone-container');
+    const phoneCount = phoneContainer.querySelectorAll('.phone-input').length;
+    
+    const phoneInputDiv = document.createElement('div');
+    phoneInputDiv.className = 'phone-input';
+    phoneInputDiv.innerHTML = `
+        <div class="form-field" style="flex-grow: 1;">
+            <label for="contact-phone-${phoneCount+1}">Additional Phone</label>
+            <input type="tel" id="contact-phone-${phoneCount+1}" name="phoneNumbers" placeholder="Enter phone number" required>
+        </div>
+        <button type="button" class="remove-phone-btn" style="margin-top: 24px;">Remove</button>
+    `;
+    
+    phoneContainer.appendChild(phoneInputDiv);
+    
+    phoneInputDiv.querySelector('.remove-phone-btn').addEventListener('click', function() {
+        phoneInputDiv.classList.add('fade-out');
+        setTimeout(() => phoneInputDiv.remove(), 300);
+    });
+});
+
+document.querySelectorAll('.remove-phone-btn').forEach(function(button) {
+    button.addEventListener('click', function() {
+        const phoneInput = this.closest('.phone-input');
+        phoneInput.classList.add('fade-out');
+        setTimeout(() => phoneInput.remove(), 300);
+    });
+});
+
+// Add animation for phone field removal
+document.head.insertAdjacentHTML('beforeend', `
+    <style>
+        .fade-out {
+            opacity: 0;
+            transform: translateX(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .phone-input {
+            transition: all 0.3s ease;
+        }
+    </style>
+`);
