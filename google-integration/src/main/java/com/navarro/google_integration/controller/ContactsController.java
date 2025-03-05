@@ -3,6 +3,7 @@ package com.navarro.google_integration.controller;
 import com.google.api.services.people.v1.model.EmailAddress;
 import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
+import com.google.api.services.people.v1.model.PhoneNumber;
 import com.navarro.google_integration.service.GoogleContactsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -54,7 +55,7 @@ public class ContactsController {
     }
 
     @PostMapping
-    public String addContact(@RequestParam String name, @RequestParam String email,
+    public String addContact(@RequestParam String name, @RequestParam String email, @RequestParam String phone,
                              OAuth2AuthenticationToken authentication, RedirectAttributes redirectAttributes) {
         try {
             // Create a new Person object
@@ -71,6 +72,11 @@ public class ContactsController {
             contactEmail.setValue(email);
             person.setEmailAddresses(Collections.singletonList(contactEmail));
 
+            // Set phone number
+            PhoneNumber contactPhone = new PhoneNumber();
+            contactPhone.setValue(phone);
+            person.setPhoneNumbers(Collections.singletonList(contactPhone));
+
             // Add the contact
             Person addedPerson = googleContactsService.addContact(person, authentication);
 
@@ -85,8 +91,8 @@ public class ContactsController {
 
     @PostMapping("/update")
     public String updateContact(@RequestParam String resourceName, @RequestParam String name,
-                                @RequestParam String email, OAuth2AuthenticationToken authentication,
-                                RedirectAttributes redirectAttributes) {
+                                @RequestParam String email, @RequestParam String phone,
+                                OAuth2AuthenticationToken authentication, RedirectAttributes redirectAttributes) {
         try {
             // Create a new Person object for the update
             Person person = new Person();
@@ -101,6 +107,11 @@ public class ContactsController {
             EmailAddress contactEmail = new EmailAddress();
             contactEmail.setValue(email);
             person.setEmailAddresses(Collections.singletonList(contactEmail));
+
+            // Set phone number
+            PhoneNumber contactPhone = new PhoneNumber();
+            contactPhone.setValue(phone);
+            person.setPhoneNumbers(Collections.singletonList(contactPhone));
 
             // Update the contact
             googleContactsService.updateContact(resourceName, person, authentication);

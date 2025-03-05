@@ -36,6 +36,7 @@
     <form id="add-contact-form" class="add-form" th:action="@{/contacts}" method="post">
         <input type="text" name="name" placeholder="Contact Name" required>
         <input type="email" name="email" placeholder="Email Address" required>
+        <input type="tel" name="phone" placeholder="Phone Number" required>
         <button type="submit" class="btn-success">Add Contact</button>
     </form>
 
@@ -45,12 +46,13 @@
         <tr>
             <th>Name</th>
             <th>Email</th>
+            <th>Phone</th>
             <th>Actions</th>
         </tr>
         </thead>
         <tbody>
         <tr th:if="${contacts == null || contacts.isEmpty()}">
-            <td colspan="3" class="empty-state">
+            <td colspan="4" class="empty-state">
                 <div>No contacts found</div>
                 <p>Add your first contact using the form above</p>
             </td>
@@ -58,11 +60,13 @@
         <tr th:each="contact : ${contacts}" class="contact-row">
             <td th:text="${contact.names != null && !contact.names.isEmpty() ? contact.names[0].displayName : 'No Name'}">Name</td>
             <td th:text="${contact.emailAddresses != null && !contact.emailAddresses.isEmpty() ? contact.emailAddresses[0].value : 'No Email'}">Email</td>
+            <td th:text="${contact.phoneNumbers != null && !contact.phoneNumbers.isEmpty() ? contact.phoneNumbers[0].value : 'No Phone'}">Phone</td>
             <td class="actions">
                 <form class="edit-form" th:action="@{/contacts/update}" method="post">
                     <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
                     <input type="text" name="name" th:value="${contact.names != null && !contact.names.isEmpty() ? contact.names[0].displayName : ''}" required>
                     <input type="email" name="email" th:value="${contact.emailAddresses != null && !contact.emailAddresses.isEmpty() ? contact.emailAddresses[0].value : ''}" required>
+                    <input type="tel" name="phone" th:value="${contact.phoneNumbers != null && !contact.phoneNumbers.isEmpty() ? contact.phoneNumbers[0].value : ''}" required>
                     <button type="submit" class="edit-btn">Update</button>
                 </form>
                 <form th:action="@{/contacts/delete}" method="post">

@@ -52,7 +52,7 @@ public class GoogleContactsService {
         PeopleService peopleService = getPeopleService(client.getAccessToken());
         ListConnectionsResponse response = peopleService.people().connections()
                 .list("people/me")
-                .setPersonFields("names,emailAddresses")
+                .setPersonFields("names,emailAddresses,phoneNumbers")
                 .execute();
 
         // Handle case where connections is null
@@ -80,7 +80,7 @@ public class GoogleContactsService {
 
         // Get the existing contact to retrieve necessary metadata
         Person existingContact = peopleService.people().get(resourceName)
-                .setPersonFields("names,emailAddresses,metadata")
+                .setPersonFields("names,emailAddresses,phoneNumbers,metadata")
                 .execute();
 
         // Set the etag for the update operation
@@ -88,7 +88,7 @@ public class GoogleContactsService {
 
         // Perform the update with explicit updatePersonFields
         return peopleService.people().updateContact(resourceName, updatedPerson)
-                .setUpdatePersonFields("names,emailAddresses")
+                .setUpdatePersonFields("names,emailAddresses,phoneNumbers")
                 .execute();
     }
 

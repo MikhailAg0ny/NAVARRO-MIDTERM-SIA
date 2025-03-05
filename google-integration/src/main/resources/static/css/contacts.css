@@ -222,8 +222,9 @@ button:active {
 }
 
 .add-form input[type="text"],
-.add-form input[type="email"] {
-  width: 45%;
+.add-form input[type="email"],
+.add-form input[type="tel"] {
+  width: 30%;
   padding: 12px;
   margin-right: 10px;
   border: 1px solid var(--medium-gray);
@@ -458,7 +459,8 @@ tbody tr:hover {
   }
 
   .add-form input[type="text"],
-  .add-form input[type="email"] {
+  .add-form input[type="email"],
+  .add-form input[type="tel"] {
     width: 100%;
     margin-bottom: 10px;
   }
